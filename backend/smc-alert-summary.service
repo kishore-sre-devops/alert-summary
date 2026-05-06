@@ -1,0 +1,12 @@
+[Unit]
+Description=SMC Alert Summary Backend
+After=network.target mysql.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/alert-summary/backend
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8001
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

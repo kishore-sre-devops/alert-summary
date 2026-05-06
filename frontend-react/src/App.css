@@ -1,0 +1,63 @@
+
+/* Dark NOC/SOC Theme Base Styles */
+:root {
+  --bg-slate-950: #020617;
+  --bg-slate-900: #0f172a;
+  --border-slate-800: #1e293b;
+  --text-slate-300: #cbd5e1;
+  --indigo-400: #818cf8;
+}
+
+body {
+  background-color: var(--bg-slate-950);
+  color: var(--text-slate-300);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.bg-noc-panel {
+  background-color: var(--bg-slate-900);
+  border: 1px solid var(--border-slate-800);
+}
+
+.text-noc-accent {
+  color: var(--indigo-400);
+}
+
+/* Pulse Animation for Critical Alerts */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s infinite;
+}
+
+/* Custom Scrollbar for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-slate-950);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-slate-800);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

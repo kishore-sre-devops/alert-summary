@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+python-dotenv
+pydantic
+cryptography
+aiofiles
+google-auth
+firebase-admin==6.2.0
+httpx
+aiosmtplib

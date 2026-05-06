@@ -1,0 +1,55 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: alert_summary
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: alert_user
+      MYSQL_PASSWORD: alert_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    restart: always
+    volumes:
+      - ./backend:/app
+    environment:
+      MYSQL_USER: alert_user
+      MYSQL_PASSWORD: alert_password
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_DB: alert_summary
+    depends_on:
+      - db
+    # Removed host port mapping 8010:8001 to stop receiving external alerts on 8010
+
+  frontend:
+    build: ./frontend
+    restart: always
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - /opt/grafana-search-app/certificate/smc:/etc/nginx/ssl:ro
+    ports:
+      - "8001:80"
+      - "8000:443"
+      - "9090:443"
+    depends_on:
+      - backend
+
+  android-sdk:
+    build:
+      context: .
+      dockerfile: Dockerfile.android
+    volumes:
+      - .:/workspace
+      - gradle-cache:/cache/.gradle
+    working_dir: /workspace
+
+volumes:
+  db_data:
+  gradle-cache:

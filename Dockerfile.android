@@ -1,0 +1,70 @@
+FROM ubuntu:24.04
+
+# Avoid prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies (Including JDK 21 and JDK 17 for toolchains)
+RUN apt-get update && apt-get install -y \
+    openjdk-21-jdk \
+    openjdk-17-jdk \
+    curl \
+    unzip \
+    git \
+    python3 \
+    python3-pip \
+    make \
+    g++ \
+    wget \
+    ca-certificates \
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Import Corporate CA Certificate
+COPY ./certs/DigiCertCA.crt /usr/local/share/ca-certificates/DigiCertCA.crt
+RUN update-ca-certificates && \
+    for cacerts in /usr/lib/jvm/java-*-openjdk-amd64/lib/security/cacerts; do \
+        keytool -import -trustcacerts -keystore "$cacerts" -storepass changeit -noprompt -alias corporate-ca -file /usr/local/share/ca-certificates/DigiCertCA.crt || true; \
+    done
+
+# Install Node.js 20 (Direct binary for speed and reliability)
+ENV NODE_VERSION 20.12.2
+RUN curl -fsSLk https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1
+
+# Setup Android SDK
+ENV ANDROID_HOME /opt/android-sdk
+ENV PATH ${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools
+
+RUN mkdir -p ${ANDROID_HOME}/cmdline-tools
+RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip \
+    && unzip /tmp/cmdline-tools.zip -d ${ANDROID_HOME}/cmdline-tools \
+    && mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest \
+    && rm /tmp/cmdline-tools.zip
+
+# Accept licenses
+RUN yes | sdkmanager --licenses
+
+# Install required components (Pre-cached in image)
+RUN sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "ndk;26.1.10909125"
+
+# Pre-install Gradle to bypass wrapper SSL issues
+ENV GRADLE_VERSION 8.2.1
+RUN wget -q --no-check-certificate https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -O /tmp/gradle.zip \
+    && unzip -q /tmp/gradle.zip -d /opt \
+    && rm /tmp/gradle.zip
+ENV PATH ${PATH}:/opt/gradle-${GRADLE_VERSION}/bin
+
+# Create a local Maven repo for critical plugins that fail in restricted networks
+RUN mkdir -p /opt/local-maven/org/jetbrains/kotlin/kotlin-gradle-plugin/1.9.22 && \
+    wget -q --no-check-certificate https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/1.9.22/kotlin-gradle-plugin-1.9.22.jar -O /opt/local-maven/org/jetbrains/kotlin/kotlin-gradle-plugin/1.9.22/kotlin-gradle-plugin-1.9.22.jar && \
+    wget -q --no-check-certificate https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/1.9.22/kotlin-gradle-plugin-1.9.22.pom -O /opt/local-maven/org/jetbrains/kotlin/kotlin-gradle-plugin/1.9.22/kotlin-gradle-plugin-1.9.22.pom && \
+    mkdir -p /opt/local-maven/org/jetbrains/kotlin/kotlin-stdlib/1.9.22 && \
+    wget -q --no-check-certificate https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.22/kotlin-stdlib-1.9.22.jar -O /opt/local-maven/org/jetbrains/kotlin/kotlin-stdlib/1.9.22/kotlin-stdlib-1.9.22.jar && \
+    wget -q --no-check-certificate https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.22/kotlin-stdlib-1.9.22.pom -O /opt/local-maven/org/jetbrains/kotlin/kotlin-stdlib/1.9.22/kotlin-stdlib-1.9.22.pom
+
+# Optimization: Set Gradle User Home to a location we can volume mount for persistence
+ENV GRADLE_USER_HOME /cache/.gradle
+RUN mkdir -p $GRADLE_USER_HOME
+
+WORKDIR /workspace
+
+CMD ["bash"]

@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Sensitive data
+certs/
+backend/firebase-key.json
+*.key
+*.crt
+*.pem
+
+# Backups and temporary files
+*_backup/
+*_backup_*/
+*.tar.gz
+*.zip
+*.bak
+test.txt
+test1.txt
+mkdir/
+
+# Build artifacts
+frontend-react/build/
+frontend/static/js/
+frontend/static/css/
+frontend/static/media/
+smcalert.apk
+*.apk
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific ignores
+smcwa_reference/
