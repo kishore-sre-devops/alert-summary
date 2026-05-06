@@ -1,0 +1,227 @@
+# Environment files and secrets
+.env
+.env.*
+*.env
+!*.env.example
+smc-lama-config/.env
+smc-lama-config/.env.*
+smc-lama-config/env.*
+!smc-lama-config/.env.example
+
+# Database backups
+smc-lama-config/database_backups/
+*.sql
+*.dump
+
+# Certificates and keys
+smc-lama-config/certificates/*.key
+smc-lama-config/certificates/*.crt
+smc-lama-config/certificates/*.pem
+*.pem
+*.key
+*.crt
+!smc-lama-config/certificates/README.md
+!smc-lama-config/certificates/*.example
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+
+# Build outputs
+# Note: ui/build/ should be ignored - it's generated during build
+ui/build/
+ui/prod/
+ui/uat/
+dist/
+*.tar.gz
+*.zip
+*.tar
+
+# IDE
+.vscode/
+.idea/
+.expo/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.old
+*.orig
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Archives (keep transfer scripts but ignore generated archives)
+SMC-LAMA-*.tar.gz
+SMC-LAMA-*.zip
+*.apk
+api/backend/secrets/
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Documentation and test scripts (local only - don't commit)
+# Root level troubleshooting docs/scripts
+*_STATUS.md
+*_GUIDE.md
+*_DEPLOYMENT.md
+DEPLOY_*.sh
+VERIFY_*.sh
+CONFIGURE_*.sh
+CHECK_*.sh
+
+# Docs folder patterns
+docs/TOKEN_*.md
+docs/UAT_*.md
+docs/*_TROUBLESHOOTING.md
+docs/*_SUMMARY.md
+docs/*_GUIDE.md
+docs/*_DEPLOYMENT.md
+docs/*_COMPLIANCE.md
+docs/*_VALIDATION.md
+docs/*_IMPLEMENTATION.md
+docs/*_ANALYSIS.md
+docs/*_EXPLANATION.md
+docs/*_CHECKLIST.md
+docs/*_REQUIREMENTS.md
+docs/*_INSTRUCTIONS.md
+docs/deployment/*.md
+docs/troubleshooting/*.md
+docs/troubleshooting/*.sh
+docs/features/*.md
+docs/guides/**/*.md
+docs/reference/*.md
+docs/testing/*.md
+docs/deployment/compliance/*.md
+docs/deployment/validation/*.md
+
+# smc-lama-config troubleshooting scripts
+smc-lama-config/*.md
+smc-lama-config/*_DEBUG*.sh
+smc-lama-config/DEPLOY_*.sh
+smc-lama-config/VERIFY_*.sh
+smc-lama-config/GET_*.sh
+smc-lama-config/diagnose.sh
+smc-lama-config/capture_*.sh
+smc-lama-config/generate_dummy*.sh
+smc-lama-config/send_*.sh
+smc-lama-config/start_test*.sh
+smc-lama-config/stop_test*.sh
+smc-lama-config/test_*.sh
+smc-lama-config/run_test*.sh
+
+# Test scripts
+test_*.py
+*_test.py
+*_TEST*.py
+check_*.sh
+run_*.sh
+test_*.sh
+*_test.sh
+*_TEST*.sh
+
+# Troubleshooting docs patterns
+TIMEOUT_*.md
+TEST_*.md
+*_FEEDBACK.md
+*_ANALYSIS.md
+*_IMPLEMENTATION.md
+*_SUMMARY.md
+*_FIX.md
+*_GUIDE.md
+*_INSTRUCTIONS.md
+*_UPDATE.md
+*_PRESERVATION.md
+*_OUTPUT.md
+*_BUGS_FOUND*.md
+*_DEPLOYMENT_READINESS*.md
+*_BUILD_AUTOMATIC*.md
+*_FOUND_AND_FIXED*.md
+
+# Agent troubleshooting docs
+agent/go/*_COMPARISON.md
+agent/go/*_SUMMARY.md
+agent/go/*_GUIDE.md
+
+# Scripts folder troubleshooting
+scripts/setup_dummy*.sh
+scripts/*_test*.sh
+
+# Keep important files
+!README.md
+!docs/README.md
+!docs/architecture/*.md
+!docs/deployment/README.md
+!docs/deployment/DEPLOYMENT_CHECKLIST.md
+!docs/deployment/PRODUCTION_DEPLOYMENT.md
+!agent/BUILD_INSTRUCTIONS.md
+!agent/builds/README.md
+!agent/go/README.md
+!agent/LAMA_EXPORTER_README.md
+!agent/TESTING_DEPLOYMENT.md
+!agent/build/Install-LAMA-Exporter.bat
+!agent/build/install-lama-exporter.ps1
+!BUILD_SUMMARY.md
+!smc-lama-config/certificates/README.md
+!smc-lama-config/certificates/.gitkeep
+
+# Ignore presentation files
+SMC_Lama_Presentation.mdsmc-lama-config/.env
+.aider*
+
+# VAPT Evidence and temporary documentation
+docs/*.png
+docs/*.jpeg
+docs/*.rar
+
+.gemini/
+gha-creds-*.json
+.github/commands/
+.github/workflows/
+.kiro/

@@ -1,0 +1,216 @@
+services:
+
+  # UI + Nginx combined - builds React app and serves with nginx
+  nginx:
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+    container_name: lama_nginx
+    volumes:
+      # Auto-configure nginx based on certificate availability
+      - ./docker-entrypoint-nginx.sh:/docker-entrypoint-nginx.sh:ro
+      # Use relative path for certificates (works on any server)
+      - ./certificates:/etc/nginx/ssl:ro
+      # Mount mobile source code for download generation
+      - ../mobile:/mobile_source:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    networks:
+      - lama-net
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+    # Custom entrypoint that auto-configures nginx
+    entrypoint: ["/bin/sh", "/docker-entrypoint-nginx.sh"]
+    # Healthcheck to detect if nginx is running
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: postgres:15
+    container_name: lama_postgres
+    shm_size: '1gb'
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+      POSTGRES_USER: ${POSTGRES_USER:-lama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-lama_prod}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lama-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lama}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: lama_clickhouse
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      TZ: Asia/Kolkata
+    networks:
+      - lama-net
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: lama_redis
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+    networks:
+      - lama-net
+
+  api:
+    build:
+      context: ..
+      dockerfile: api/backend/Dockerfile
+    container_name: lama_api
+    restart: unless-stopped
+    command: gunicorn app.main:app --workers 8 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120 --keep-alive 5
+    volumes:
+      - ./certificates:/app/certificates:ro
+      - scheduler_health:/tmp:rw
+      - ../api/backend:/app
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      TZ: Asia/Kolkata
+      ACTIVE_ENVIRONMENT: "uat"
+      ENABLE_IN_PROCESS_SCHEDULER: "false"
+      SCHEDULER_HEARTBEAT_PATH: /tmp/heartbeat
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST:-lama_clickhouse}
+      CLICKHOUSE_PORT: ${CLICKHOUSE_PORT:-8123}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-lama}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-lama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-lama_prod}
+      
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-dineshpathak@smcindiaonline.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      
+      # LAMA Exchange Configuration
+      LAMA_EXCHANGE_SSL_VERIFY: ${LAMA_EXCHANGE_SSL_VERIFY:-true}
+
+      # LGTM (Prometheus/Mimir) Configuration
+      LGTM_PROMETHEUS_URL: ${LGTM_PROMETHEUS_URL:-http://10.215.33.196:9090}
+      MIMIR_URL: ${MIMIR_URL:-http://10.236.26.167:9009/prometheus}
+      
+      # AWS V2.0 Configuration
+      AWS_ROLE_ARN: ${AWS_ROLE_ARN}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ap-south-1}
+    networks:
+      - lama-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 90s
+
+  scheduler:
+    build:
+      context: ..
+      dockerfile: api/backend/Dockerfile
+    container_name: lama_scheduler
+    restart: unless-stopped
+    # Use python -m to run the dedicated scheduler script
+    command: python -m app.scheduler_main
+    volumes:
+      - scheduler_health:/tmp:rw
+      - ../api/backend:/app
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      TZ: Asia/Kolkata
+      ACTIVE_ENVIRONMENT: "uat"
+      SCHEDULER_HEARTBEAT_PATH: /tmp/heartbeat
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST:-lama_clickhouse}
+      CLICKHOUSE_PORT: ${CLICKHOUSE_PORT:-8123}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-lama}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-lama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-lama_prod}
+      
+      # LAMA Exchange Configuration (Credentials needed for exchange schedulers)
+      LAMA_EXCHANGE_SSL_VERIFY: ${LAMA_EXCHANGE_SSL_VERIFY:-true}
+
+      # LGTM (Prometheus/Mimir) Configuration
+      LGTM_PROMETHEUS_URL: ${LGTM_PROMETHEUS_URL:-http://10.215.33.196:9090}
+      MIMIR_URL: ${MIMIR_URL:-http://10.236.26.167:9009/prometheus}
+      
+      # AWS V2.0 Configuration
+      AWS_ROLE_ARN: ${AWS_ROLE_ARN}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ap-south-1}
+    networks:
+      - lama-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    # Healthcheck: Verify heartbeat file is updated
+    healthcheck:
+      test: ["CMD-SHELL", "test $(find /tmp/heartbeat -mmin -2 | wc -l) -gt 0 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  piper:
+    image: rhasspy/wyoming-piper
+    container_name: lama_piper
+    command: --voice en_US-lessac-medium
+    volumes:
+      - piper-data:/data
+    networks:
+      - lama-net
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  clickhouse_data:
+  scheduler_health:
+  piper-data:
+
+networks:
+  lama-net:
+    driver: bridge

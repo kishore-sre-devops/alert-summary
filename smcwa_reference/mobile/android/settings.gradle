@@ -1,0 +1,28 @@
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+}
+
+plugins {
+    id("com.facebook.react.settings")
+}
+
+rootProject.name = 'smc-lama-mobile'
+
+include ':app'
+
+// Autolinking
+def nativeModulesGradle = new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), "../native_modules.gradle")
+apply from: nativeModulesGradle
+applyNativeModulesSettingsGradle(settings)
+
+// EXPO AUTOLINKING
+def expoAutolinking = new File(["node", "--print", "require.resolve('expo-modules-autolinking/package.json', { paths: [require.resolve('expo/package.json')] })"].execute(null, rootDir).text.trim(), "../scripts/android/autolinking_implementation.gradle")
+apply from: expoAutolinking
+useExpoModules()
+
+// FORCE INCLUDE EXPO AND ITS CORE MODULE
+include ':expo'
+project(':expo').projectDir = new File(rootDir, '../node_modules/expo/android')
+
+include ':expo-modules-core'
+project(':expo-modules-core').projectDir = new File(rootDir, '../node_modules/expo-modules-core/android')

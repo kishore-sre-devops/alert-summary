@@ -1,0 +1,16 @@
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+            force 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+        }
+    }
+}
+gradle.projectsLoaded {
+    rootProject.buildscript.configurations.all {
+        resolutionStrategy {
+            force 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+            force 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+        }
+    }
+}

@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-jose
+pydantic
+prometheus-api-client
+requests
+celery[redis]==5.3.6
+redis==5.0.4
+httpx
+cryptography
+# Add any other dependencies your app uses

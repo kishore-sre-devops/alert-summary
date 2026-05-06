@@ -33,8 +33,8 @@ frontend-react/build/
 frontend/static/js/
 frontend/static/css/
 frontend/static/media/
-smcalert.apk
-*.apk
+# smcalert.apk
+# *.apk
 
 # Dependencies
 node_modules/
@@ -47,4 +47,21 @@ jspm_packages/
 *.swo
 
 # Project specific ignores
-smcwa_reference/
+# smcwa_reference/
+
+# Mobile/Android build artifacts in smcwa_reference
+smcwa_reference/mobile/android/.gradle/
+smcwa_reference/mobile/android/app/build/
+smcwa_reference/mobile/android/build/
+smcwa_reference/mobile/ios/build/
+smcwa_reference/mobile/node_modules/
+smcwa_reference/mobile/.expo/
+
+# Secrets and sensitive files in smcwa_reference
+**/firebase-credentials.json
+**/firebase-key.json
+**/*.keystore
+**/*.key
+**/*.crt
+**/*.pem
+smcwa_reference/smc-lama-config/certificates/

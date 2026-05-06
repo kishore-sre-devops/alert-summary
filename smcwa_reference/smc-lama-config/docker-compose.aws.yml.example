@@ -1,0 +1,87 @@
+# Example docker-compose.yml for AWS deployment
+# Copy this file to docker-compose.yml and update the certificate path
+
+version: "3.9"
+
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: lama_nginx
+    volumes:
+      - ../ui/build:/usr/share/nginx/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # UPDATE THIS PATH to match your AWS server certificate location
+      - /path/to/certificates:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    networks:
+      - lama-net
+
+  postgres:
+    image: postgres:15
+    container_name: lama_postgres
+    environment:
+      POSTGRES_USER: lama
+      POSTGRES_PASSWORD: 'SmcLama_DB_2024\!'
+      POSTGRES_DB: lama
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lama-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: lama_clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    networks:
+      - lama-net
+
+  redis:
+    image: redis:7
+    container_name: lama_redis
+    networks:
+      - lama-net
+
+  api:
+    build:
+      context: ../api/backend
+    container_name: lama_api
+    environment:
+      CLICKHOUSE_HOST: lama_clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_DB: lama
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ""
+
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: lama
+      POSTGRES_PASSWORD: 'SmcLama_DB_2024\!'
+      POSTGRES_DB: lama
+      
+      JWT_SECRET: 3f77e08e11b4af3cb1fd5f0efddc87a75f819a567bb86a78b4510c4f0b0b872e
+      ADMIN_EMAIL: admin@smc.local
+      ADMIN_PASSWORD: Admin@123
+    depends_on:
+      - postgres
+      - clickhouse
+      - redis
+    networks:
+      - lama-net
+
+volumes:
+  pgdata:
+  clickhouse_data:
+
+networks:
+  lama-net:
+    driver: bridge
+

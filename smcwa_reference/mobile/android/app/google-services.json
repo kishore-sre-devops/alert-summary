@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "655248995621",
+    "project_id": "stx-grafana",
+    "storage_bucket": "stx-grafana.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655248995621:android:466c386a30533fdbf616cc",
+        "android_client_info": {
+          "package_name": "com.smc.lama.alerts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "655248995621-auq03bens2dj6cl656tfgm550s1p0ukh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smc.lama.alerts",
+            "certificate_hash": "3a83568b855f5a93018af293a0b8baf5c24dd30a"
+          }
+        },
+        {
+          "client_id": "655248995621-908k7sfp8rrqv6n8tnmd0qtosvjjdm8m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg2ib2PfUgo2DndfJ2Z42dZUIUT5MNWKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "655248995621-908k7sfp8rrqv6n8tnmd0qtosvjjdm8m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

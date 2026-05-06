@@ -1,0 +1,17 @@
+node_modules/
+.git/
+dist/
+build/
+*.log
+*.bin
+*.tar.gz
+*.zip
+.next/
+venv/
+.venv/
+.env
+.env.*
+docker/data/
+clickhouse/data/
+prometheus/data/
+tmp/

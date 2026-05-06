@@ -1,0 +1,103 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+  <!-- Core Permissions for Alarms -->
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+  <uses-permission android:name="android.permission.VIBRATE" />
+  <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+  
+  <!-- Permissions for modern Android -->
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+  <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+  
+  <!-- Optional but Recommended for Reliability -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+  <!-- Standard App Permissions -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <data android:scheme="https" />
+    </intent>
+  </queries>
+
+  <application
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme">
+
+    <!-- React Native Main Activity -->
+    <activity
+        android:name=".MainActivity"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize"
+        android:theme="@style/Theme.App.SplashScreen"
+        android:exported="true"
+        android:screenOrientation="portrait">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="com.smc.alert" />
+      </intent-filter>
+    </activity>
+
+    <!--
+      NATIVE ALERTING COMPONENTS (UPDATED)
+    -->
+    <!-- 1. Firebase Messaging Service (Entry point for FCM) -->
+    <service
+        android:name="com.smc.lama.alerts.alerting.AlertingFirebaseService"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+    </service>
+
+    <!-- 2. The Foreground Service for playing the alarm -->
+    <service
+        android:name="com.smc.lama.alerts.alerting.AlarmService"
+        android:exported="false"
+        android:foregroundServiceType="mediaPlayback" />
+
+    <!-- 3. The Full-Screen Activity that shows over the lock screen -->
+    <activity
+        android:name="com.smc.lama.alerts.alerting.AlarmActivity"
+        android:exported="false"
+        android:launchMode="singleTop"
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:excludeFromRecents="true"
+        android:showWhenLocked="true"
+        android:turnScreenOn="true" />
+        
+    <!-- 4. Broadcast Receiver to handle notification actions -->
+    <receiver
+        android:name="com.smc.lama.alerts.alerting.AlarmActionReceiver"
+        android:exported="false" />
+    <!--
+      END OF NATIVE ALERTING COMPONENTS
+    -->
+
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="false" />
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS" />
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0" />
+    <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false" />
+  </application>
+</manifest>

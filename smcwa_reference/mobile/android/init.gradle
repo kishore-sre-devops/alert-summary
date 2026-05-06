@@ -1,0 +1,49 @@
+allprojects {
+    buildscript {
+        repositories {
+            maven { url 'https://repo1.maven.org/maven2/' }
+            google()
+        }
+    }
+    repositories {
+        maven { url 'https://repo1.maven.org/maven2/' }
+        google()
+    }
+}
+
+// FORCE redirection for all projects, including those that hardcode repositories
+gradle.allprojects { project ->
+    project.buildscript.repositories.all { repo ->
+        if (repo instanceof MavenArtifactRepository) {
+            project.logger.lifecycle("Redirecting ${project.name} buildscript repository ${repo.url} -> repo1.maven.org")
+            repo.url = "https://repo1.maven.org/maven2/"
+        }
+    }
+    project.repositories.all { repo ->
+        if (repo instanceof MavenArtifactRepository) {
+            project.logger.lifecycle("Redirecting ${project.name} project repository ${repo.url} -> repo1.maven.org")
+            repo.url = "https://repo1.maven.org/maven2/"
+        }
+    }
+}
+
+// Intercept before any project is even evaluated
+gradle.beforeProject { project ->
+    project.buildscript.repositories {
+        maven { url 'https://repo1.maven.org/maven2/' }
+        google()
+    }
+    project.repositories {
+        maven { url 'https://repo1.maven.org/maven2/' }
+        google()
+    }
+}
+
+settingsEvaluated { settings ->
+    settings.pluginManagement {
+        repositories {
+            maven { url 'https://repo1.maven.org/maven2/' }
+            google()
+        }
+    }
+}

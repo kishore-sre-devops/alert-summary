@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "SMC LAMA Alerts",
+    "slug": "smc-lama-alerts",
+    "version": "1.0.53",
+    "scheme": "com.smc.lama.alerts",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smc.lama.alerts",
+      "googleServicesFile": "./ios/GoogleService-Info.plist",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification", "voip"]
+      }
+    },
+    "android": {
+      "versionCode": 53,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.smc.lama.alerts",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "useAndroidX": true,
+            "enableProguardInReleaseBuilds": true,
+            "extraMavenRepos": ["../../node_modules/react-native/android"]
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "smc-lama-alerts"
+      },
+      "apiUrl": "https://smcalert.smcindiaonline.com:8000/api/v1"
+ 
+    }
+  }
+}

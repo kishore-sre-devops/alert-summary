@@ -1,0 +1,36 @@
+# Environment files
+.env
+.env.*
+*.env
+
+# Database backups
+database_backups/
+*.sql
+!clickhouse-init/init.sql
+
+# Certificates
+# Note: Allowing specific certificate files for deployment convenience
+# WARNING: These are sensitive files - ensure repository is private!
+certificates/*.key
+certificates/*.crt
+certificates/*.pem
+!certificates/README.md
+!certificates/.gitkeep
+# Allow specific certificate files (uncomment to commit them)
+!certificates/fullchain.crt
+!certificates/wildcard_smcindiaonline_com.key
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+agent/go/smc-lama-agent
+
+# Go agent binaries
+agent/go/smc-lama-agent
+agent/go/build/
+*.exe

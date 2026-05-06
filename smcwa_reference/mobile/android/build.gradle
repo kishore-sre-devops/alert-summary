@@ -1,0 +1,44 @@
+buildscript {
+    repositories {
+        maven { url 'https://repo1.maven.org/maven2/' }
+        google()
+    }
+
+    ext {
+        buildToolsVersion = '34.0.0'
+        minSdkVersion = 23
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        kotlinVersion = '1.9.23'
+        ndkVersion = "26.1.10909125"
+    }
+
+    dependencies {
+        classpath 'com.google.gms:google-services:4.4.1'
+        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath files("../node_modules/@react-native/gradle-plugin/react-native-gradle-plugin/build/libs/react-native-gradle-plugin.jar")
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    repositories {
+        maven {
+            url(new File(['node', '--print',
+                "require.resolve('react-native/package.json')"]
+                .execute(null, rootDir).text.trim(), '../android'))
+        }
+
+        maven {
+            url(new File(['node', '--print',
+                "require.resolve('jsc-android/package.json', { paths: [require.resolve('react-native/package.json')] })"]
+                .execute(null, rootDir).text.trim(), '../dist'))
+        }
+
+        maven { url 'https://repo1.maven.org/maven2/' }
+        google()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
